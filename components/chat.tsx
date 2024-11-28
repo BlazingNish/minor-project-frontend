@@ -4,7 +4,7 @@ import { SendHorizonalIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
-import { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 
 const Chat = () => {
@@ -15,11 +15,17 @@ const Chat = () => {
       content: "Hello! I am your assistant. How can I help you today?",
     },
   ]);
+  const [newMessage, setNewMessage] = useState("");
   useEffect(() => {
     if (ref.current === null) return;
     ref.current.scrollTo(0, ref.current.scrollHeight);
   }, [messages]);
-  const sendMessage = () => {};
+  const sendMessage = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (newMessage.trim() === "") return;
+    setMessages((prev) => [...prev, { role: "user", content: newMessage }]);
+    setNewMessage("");
+  };
   return (
     <section className='py-24 text-zinc-700'>
       <div className='mx-auto mt-3 w-full max-w-lg'>
@@ -64,13 +70,14 @@ const Chat = () => {
             name='message'
             placeholder='Ask me anything......'
             className='pr-12 placeholder:italic placeholder:text-zinc-600/75 focus-visible:ring-zinc-500'
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
           />
           <Button
             size='icon'
-            type='submit'
             variant='secondary'
             className='absolute right-1 top-1 h-8 w-10'
-            onClick={sendMessage}
+            onClick={(event) => sendMessage(event)}
           >
             <SendHorizonalIcon className='h-5 w-5 text-emerald-500' />
           </Button>
