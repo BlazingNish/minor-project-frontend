@@ -2,6 +2,7 @@
 import InputFields from "@/components/inputFields";
 import Questions from "@/components/questionsComponent";
 import VideoPlayer from "@/components/videoPlayer";
+import axios from "axios";
 import { useEffect, useState } from "react";
 const questions = [
   {
@@ -72,9 +73,16 @@ const GenerateQuestions = ({}) => {
   useEffect(() => {
     setIsClient(true);
   }, []);
+  const uploadLink = (url: string) => {
+    const data  = axios.post('http://localhost:8000/upload', {url: url});
+    console.log(data);
+  }
   return (
     <div className='mx-3 flex-col justify-center items-center align-middle text-center'>
-      <InputFields addUrl={(url: string) => setVideoUrl(url)} />
+      <InputFields addUrl={(url: string) => {
+        setVideoUrl(url);
+        uploadLink(url);
+      }} />
       <div className='flex justify-center items-center my-10'>
         {isClient && <VideoPlayer url={videoUrl} isPlaying={false} />}
       </div>
