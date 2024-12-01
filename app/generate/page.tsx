@@ -65,32 +65,57 @@ const questions = [
     answer: 2,
   },
 ];
-const GenerateQuestions = ({}) => {
+
+const GenerateQuestions = () => {
   const [videoUrl, setVideoUrl] = useState(
     "https://youtu.be/fhzKLBZJC3w?si=G5KdN0GF0ZBxzfGF"
   );
+  const [isSet, setIsSet] = useState(false);
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
     setIsClient(true);
   }, []);
-  const uploadLink = (url: string) => {
-    const data  = axios.post('http://localhost:8000/upload', {video_url: url});
-    console.log(data);
+  function extractVideoID(url: string, param: string): string | null {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.searchParams.get(param);
+    } catch (err) {
+      console.error("Invalid URL:", err);
+      return null;
+    }
   }
+  const uploadLink = (url: string) => {
+    const truncatedUrl = extractVideoID(url, "si");
+    const data = axios.post("http://localhost:8000/upload", {
+      video_url: truncatedUrl,
+    });
+    data.then((res) => {
+      if (res.status == 200 || res.status == 210) {
+        console.log("Uploaded Successfully");
+      }
+    });
+    console.log(data);
+  };
   return (
     <div className='mx-3 flex-col justify-center items-center align-middle text-center'>
-      <InputFields addUrl={(url: string) => {
-        setVideoUrl(url);
-        uploadLink(url);
-      }} />
-      <div className='flex justify-center items-center my-10'>
-        {isClient && <VideoPlayer url={videoUrl} isPlaying={false} />}
-      </div>
-      <div>
-        {questions.map((question) => {
-          return <Questions key={question.id} questionObject={question} />;
-        })}
-      </div>
+      <InputFields
+        addUrl={(url: string) => {
+          setVideoUrl(url);
+          uploadLink(url);
+        }}
+      />
+      {isSet && (
+        <div>
+          <div className='flex justify-center items-center my-10'>
+            {isClient && <VideoPlayer url={videoUrl} isPlaying={false} />}
+          </div>
+          <div>
+            {questions.map((question) => {
+              return <Questions key={question.id} questionObject={question} />;
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
