@@ -74,7 +74,7 @@ const GenerateQuestions = ({}) => {
     setIsClient(true);
   }, []);
   const uploadLink = (url: string) => {
-    const data  = axios.post('http://localhost:8000/upload', {url: url});
+    const data  = axios.post('http://localhost:8000/upload', {video_url: url});
     console.log(data);
   }
   return (
