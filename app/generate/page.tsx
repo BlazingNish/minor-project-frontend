@@ -9,106 +9,123 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Circles } from "react-loader-spinner";
 import "react-loader-spinner/dist/main";
 
-const questions = [
-  {
-    id: 1,
-    question:
-      "Which sublayer of the Data Link Layer is responsible for managing communication between upper and lower layers?",
-    options: [
-      "Network Layer",
-      "Logical Link Control (LLC)",
-      "Media Access Control (MAC)",
-      "Physical Layer",
-    ],
-    answer: 1,
-  },
-  {
-    id: 2,
-    question: "What is a primary function of the MAC sublayer?",
-    options: [
-      "Flow Control",
-      "Data Encapsulation",
-      "Packet Disassembly",
-      "Error Detection at the Application Layer",
-    ],
-    answer: 1,
-  },
-  {
-    id: 3,
-    question:
-      "Which component is directly responsible for managing flow control within the Data Link Layer?",
-    options: [
-      "MAC Sublayer",
-      "LLC Sublayer",
-      "Network Layer",
-      "Physical Layer",
-    ],
-    answer: 1,
-  },
-  {
-    id: 4,
-    question:
-      "What does the MAC sublayer add to the data received from the Network Layer to create frames?",
-    options: [
-      "Flow Control and Encryption",
-      "Network Layer Protocols",
-      "Header and Trailer",
-      "Logical Link Control",
-    ],
-    answer: 2,
-  },
-  {
-    id: 5,
-    question:
-      "In which scenario does the MAC sublayer remove frames from the physical medium?",
-    options: [
-      "When transmitting data from sender to receiver",
-      "When communicating with the Network Layer",
-      "During frame reception on the receiver’s side",
-      "When adding control information",
-    ],
-    answer: 2,
-  },
-];
+// const questions = [
+//   {
+//     id: 1,
+//     question:
+//       "Which sublayer of the Data Link Layer is responsible for managing communication between upper and lower layers?",
+//     options: [
+//       "Network Layer",
+//       "Logical Link Control (LLC)",
+//       "Media Access Control (MAC)",
+//       "Physical Layer",
+//     ],
+//     answer: 1,
+//   },
+//   {
+//     id: 2,
+//     question: "What is a primary function of the MAC sublayer?",
+//     options: [
+//       "Flow Control",
+//       "Data Encapsulation",
+//       "Packet Disassembly",
+//       "Error Detection at the Application Layer",
+//     ],
+//     answer: 1,
+//   },
+//   {
+//     id: 3,
+//     question:
+//       "Which component is directly responsible for managing flow control within the Data Link Layer?",
+//     options: [
+//       "MAC Sublayer",
+//       "LLC Sublayer",
+//       "Network Layer",
+//       "Physical Layer",
+//     ],
+//     answer: 1,
+//   },
+//   {
+//     id: 4,
+//     question:
+//       "What does the MAC sublayer add to the data received from the Network Layer to create frames?",
+//     options: [
+//       "Flow Control and Encryption",
+//       "Network Layer Protocols",
+//       "Header and Trailer",
+//       "Logical Link Control",
+//     ],
+//     answer: 2,
+//   },
+//   {
+//     id: 5,
+//     question:
+//       "In which scenario does the MAC sublayer remove frames from the physical medium?",
+//     options: [
+//       "When transmitting data from sender to receiver",
+//       "When communicating with the Network Layer",
+//       "During frame reception on the receiver’s side",
+//       "When adding control information",
+//     ],
+//     answer: 2,
+//   },
+// ];
 
 const GenerateQuestions = () => {
   const [videoUrl, setVideoUrl] = useState(
-    "https://youtu.be/tRwHpyOq4P4?si=JVGu_UCQ7ZZlxQ0H"
+    ""
   );
-  const [isSet, setIsSet] = useState(true);
+  const [questions, setQuestions] = useState<Array<{answer: number, question:string, options:Array<string>}>>([]);
+  const [isSet, setIsSet] = useState(false);
+  const [summary, setSummary] = useState("")
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     setIsClient(true);
   }, []);
-  function extractVideoID(url: string, param: string): string | null {
+  function extractVideoID(url: string): string|null{
     try {
       const urlObj = new URL(url);
-      return urlObj.searchParams.get(param);
+      const siParam = urlObj.searchParams.get('si');
+      const vParam = urlObj.searchParams.get('v');
+      return siParam?siParam:vParam;
     } catch (err) {
       console.error("Invalid URL:", err);
       return null;
     }
   }
-  const uploadLink = async () => {
-    const truncatedUrl = await extractVideoID(videoUrl, "si");
-    setIsLoading(true);
-    // const data = axios.post("http://localhost:8000/upload", {
-    //   video_url: truncatedUrl,
-    // });
-    // data.then((res) => {
-    //   if (res.status == 200 || res.status == 210) {
-    //     console.log("Uploaded Successfully");
-    //   }
-    // });
+
+  const getContent = async(url: string|null)=>{
+    const data = await axios.post("http://localhost:8000/upload",{video_url: url});
+    const content = data.data.content;
+    console.log("Uploaded URL Successfully")
+    console.log(content);
+    return content;
+  }
+  const uploadLink = async (url: string) => {
+    const truncatedUrl = extractVideoID(url);
+    setVideoUrl(url);
     console.log(truncatedUrl);
+    setIsLoading(true);
+    const content = getContent(truncatedUrl)
+    const mcqResponse = axios.post('http://localhost:8000/mcqs',{content: content})
+
+    mcqResponse.then((res)=>{
+      console.log(res);
+      setQuestions(res.data.questions);
+      setSummary(res.data.summary);
+
+      setTimeout(()=>{
+        setIsLoading(false)
+        setIsSet(true);
+      }, 2000)
+    })
   };
   return (
     <div className='mx-3 flex-col justify-center items-center align-middle text-center'>
       <InputFields
         addUrl={(url: string) => {
-          setVideoUrl(url);
-          uploadLink();
+          uploadLink(url);
         }}
       />
       {isLoading && (
@@ -127,9 +144,9 @@ const GenerateQuestions = () => {
           </TabsList>
           <TabsContent value='MCQ'>
             <div>
-              {questions.map((question) => {
+              {questions.map((question, index) => {
                 return (
-                  <Questions key={question.id} questionObject={question} />
+                  <Questions key={index} questionObject={question} />
                 );
               })}
             </div>
@@ -140,37 +157,7 @@ const GenerateQuestions = () => {
                 <CardTitle>Summary</CardTitle>
               </CardHeader>
               <CardContent className='flex justify-center p-10'>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi
-                laborum praesentium iste veniam aut cum aperiam dolore sapiente
-                numquam rerum, sed quia quas qui, laboriosam consequatur.
-                Perferendis a eos perspiciatis et eius expedita vel, in quis
-                molestiae repellendus numquam sequi similique vero corrupti
-                delectus inventore! Provident ipsa labore ea inventore libero
-                ipsam expedita dolores, porro rem totam quod doloribus, officia
-                mollitia aspernatur amet odio. Fugiat laboriosam reiciendis
-                nesciunt explicabo perspiciatis consequuntur similique soluta
-                vitae accusantium? Quo, ducimus. Sapiente, autem. Asperiores
-                tenetur provident qui reiciendis nesciunt veritatis possimus,
-                cum aliquam. Voluptatibus reprehenderit provident dolor eos
-                quasi. Corrupti amet placeat cum, iure alias sapiente maxime
-                facilis reiciendis, at aspernatur beatae veniam, nihil
-                molestiae? Quasi, natus. Distinctio sunt dignissimos unde.
-                Molestias veniam accusantium, repudiandae totam laboriosam sint,
-                doloribus ipsam necessitatibus ullam hic dolores aliquam vitae
-                modi magni commodi mollitia sunt unde distinctio. Aspernatur
-                vitae rem cumque, quos debitis quod, aut ex deserunt est
-                doloremque illo eum ipsa nemo tenetur doloribus vero qui at
-                nulla id recusandae. Sequi dicta earum nobis quasi aspernatur
-                sed soluta voluptatum atque corporis qui fugit placeat inventore
-                obcaecati ab dolorem eveniet, minus esse expedita dolore nisi
-                quaerat! Enim fugiat unde, aliquam dolore maiores ratione
-                officia non ex earum, perferendis laboriosam, ut rem doloremque
-                eaque at quam animi perspiciatis quae molestiae amet sit
-                excepturi voluptatem quos. Blanditiis sed, a temporibus sapiente
-                rerum aliquid pariatur eos, aperiam veritatis assumenda
-                molestiae voluptas molestias labore. Eum illo numquam veniam
-                quibusdam eligendi delectus facere sapiente. Debitis distinctio
-                in quae totam ipsa. Doloribus, exercitationem quos!
+                {summary}
               </CardContent>
             </Card>
           </TabsContent>

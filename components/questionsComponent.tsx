@@ -4,7 +4,6 @@ import { useState } from "react";
 
 interface QuestionProps {
   questionObject: {
-    id: number;
     question: string;
     options: string[];
     answer: number;
