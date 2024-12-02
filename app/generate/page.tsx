@@ -76,53 +76,72 @@ const GenerateQuestions = () => {
   const [videoUrl, setVideoUrl] = useState(
     ""
   );
-  const [questions, setQuestions] = useState<Array<{answer: number, question:string, options:Array<string>}>>([]);
+  const [questions, setQuestions] = useState<Array<{ answer: number, question: string, options: Array<string> }>>([]);
   const [isSet, setIsSet] = useState(false);
   const [summary, setSummary] = useState("")
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     setIsClient(true);
-    
+    const savedQuestions = localStorage.getItem("questions");
+    const savedSummary = localStorage.getItem("summary");
+    const savedUrl = localStorage.getItem("videoUrl");
+
+    if(savedQuestions && savedSummary && savedUrl){
+      setQuestions(JSON.parse(savedQuestions));
+      setSummary(savedSummary)
+      setVideoUrl(savedUrl)
+      setIsSet(true);
+    }
+
   }, [videoUrl]);
-  function extractVideoID(url: string): string|null{
+  function extractVideoID(url: string): string | null {
     try {
       const urlObj = new URL(url);
       const siParam = urlObj.searchParams.get('si');
       const vParam = urlObj.searchParams.get('v');
-      return siParam?siParam:vParam;
+      return siParam ? siParam : vParam;
     } catch (err) {
       console.error("Invalid URL:", err);
       return null;
     }
   }
 
-  const getContent = async(url: string|null)=>{
-    const data = await axios.post("http://localhost:8000/upload",{video_url: url});
+  const getContent = async (url: string | null) => {
+    const data = await axios.post("http://localhost:8000/upload", { video_url: url });
     const content = data.data.content;
     console.log("Uploaded URL Successfully")
     console.log(content);
     return content;
   }
   const uploadLink = async (url: string) => {
-    const truncatedUrl = extractVideoID(url);
-    setVideoUrl(url);
-    console.log(truncatedUrl);
-    setIsLoading(true);
-    setIsSet(false);
-    const content = getContent(truncatedUrl)
-    const mcqResponse = axios.post('http://localhost:8000/mcqs',{content: content})
+    try {
 
-    mcqResponse.then((res)=>{
-      console.log(res);
-      setQuestions(res.data.questions);
-      setSummary(res.data.summary);
+      const truncatedUrl = extractVideoID(url);
+      setVideoUrl(url);
+      console.log(truncatedUrl);
+      setIsLoading(true);
+      setIsSet(false);
+      const content = await getContent(truncatedUrl)
+      const mcqResponse = await axios.post('http://localhost:8000/mcqs', { content: content })
+      console.log(mcqResponse.data)
 
-      setTimeout(()=>{
+      localStorage.setItem("questions", JSON.stringify(mcqResponse.data.questions));
+      localStorage.setItem("summary", mcqResponse.data.summary)
+      localStorage.setItem("videoUrl", url);
+
+      setQuestions(mcqResponse.data.questions);
+      setSummary(mcqResponse.data.summary)
+
+      setTimeout(() => {
         setIsLoading(false)
         setIsSet(true);
       }, 500)
-    })
+
+    } catch (err) {
+      console.log('There is some error with the apis', err)
+      setIsLoading(false)
+    }
   };
   return (
     <div className='mx-3 flex-col justify-center items-center align-middle text-center'>

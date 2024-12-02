@@ -16,28 +16,28 @@ export default function Navbar() {
 
             <div className='grid gap-2 py-6'>
               <Link
-                href='#'
+                href='/'
                 className='flex w-full items-center py-2 text-lg font-semibold'
                 prefetch={false}
               >
                 Home
               </Link>
               <Link
-                href='#'
+                href='/generate'
                 className='flex w-full items-center py-2 text-lg font-semibold'
                 prefetch={false}
               >
                 Generate Questions
               </Link>
               <Link
-                href='#'
+                href='/summarize'
                 className='flex w-full items-center py-2 text-lg font-semibold'
                 prefetch={false}
               >
                 Summarize Text
               </Link>
               <Link
-                href='#'
+                href='chat'
                 className='flex w-full items-center py-2 text-lg font-semibold'
                 prefetch={false}
               >
