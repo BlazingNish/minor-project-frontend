@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Circles } from "react-loader-spinner";
 import "react-loader-spinner/dist/main";
+import Markdown from "react-markdown"
 
 // const questions = [
 //   {
@@ -118,7 +119,7 @@ const GenerateQuestions = () => {
       setTimeout(()=>{
         setIsLoading(false)
         setIsSet(true);
-      }, 2000)
+      }, 500)
     })
   };
   return (
@@ -156,8 +157,8 @@ const GenerateQuestions = () => {
               <CardHeader>
                 <CardTitle>Summary</CardTitle>
               </CardHeader>
-              <CardContent className='flex justify-center p-10'>
-                {summary}
+              <CardContent className='text-left'>
+                <Markdown>{summary}</Markdown>
               </CardContent>
             </Card>
           </TabsContent>
