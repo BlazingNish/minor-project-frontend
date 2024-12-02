@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "./ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface QuestionProps {
   questionObject: {
@@ -11,6 +11,14 @@ interface QuestionProps {
 }
 
 const Questions = ({ questionObject }: QuestionProps) => {
+  useEffect(()=>{
+    setButtonVariants({
+      button1:"options",
+      button2:"options",
+      button3:"options",
+      button4:"options"
+    })
+  }, [])
   const [buttonVariants, setButtonVariants] = useState({
     button1: "options",
     button2: "options",
@@ -45,7 +53,7 @@ const Questions = ({ questionObject }: QuestionProps) => {
                 | "wrongOption"
             }
             onClick={() => checkAnswer(0, "button1")}
-            className="w-1/3"
+            className="w-1/3 min-w-fit"
           >
             {questionObject.options[0]}
           </Button>
@@ -57,7 +65,7 @@ const Questions = ({ questionObject }: QuestionProps) => {
                 | "wrongOption"
             }
             onClick={() => checkAnswer(1, "button2")}
-            className="w-1/3"
+            className="w-1/3 min-w-fit"
           >
             {questionObject.options[1]}
           </Button>
@@ -69,7 +77,7 @@ const Questions = ({ questionObject }: QuestionProps) => {
                 | "wrongOption"
             }
             onClick={() => checkAnswer(2, "button3")}
-            className="w-1/3"
+            className="w-1/3 min-w-fit"
           >
             {questionObject.options[2]}
           </Button>
@@ -81,7 +89,7 @@ const Questions = ({ questionObject }: QuestionProps) => {
                 | "wrongOption"
             }
             onClick={() => checkAnswer(3, "button4")}
-            className="w-1/3"
+            className="w-1/3 min-w-fit"
           >
             {questionObject.options[3]}
           </Button>

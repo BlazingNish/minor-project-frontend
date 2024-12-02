@@ -8,7 +8,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 
 const Chat = () => {
-  const ref = useRef<HTMLDivElement>(null);
+  const endRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState([
     {
       role: "assistant",
@@ -16,70 +16,87 @@ const Chat = () => {
     },
   ]);
   const [newMessage, setNewMessage] = useState("");
+
+  // Scroll to the bottom whenever messages change
   useEffect(() => {
-    if (ref.current === null) return;
-    ref.current.scrollTo(0, ref.current.scrollHeight);
-  }, [messages]);
+    if (!endRef)return;
+
+    // Ensure scroll happens after DOM update
+    setTimeout(() => {
+
+      endRef.current?.scrollIntoView();
+    }, 100); // Delay to ensure DOM updates before scroll
+  }, [messages]); // Re-run when messages change
+
   const sendMessage = (event: React.FormEvent) => {
     event.preventDefault();
     if (newMessage.trim() === "") return;
-    setMessages((prev) => [...prev, { role: "user", content: newMessage }]);
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: newMessage },
+    ]);
     setNewMessage("");
   };
+
   return (
-    <section className='py-24 text-zinc-700'>
-      <div className='mx-auto mt-3 w-full max-w-lg'>
-        <ScrollArea className='mb-2 h-[400px] rounded-md border p-4' ref={ref}>
+    <section className="py-24 text-zinc-700">
+      <div className="mx-auto mt-3 w-full max-w-lg">
+        {/* Attach ref to the ScrollArea container */}
+        <ScrollArea
+          className="mb-2 h-[400px] rounded-md border p-4 overflow-auto"
+        >
+          {/* Render all messages */}
           {messages.map((m, index) => (
-            <div key={index} className='mr-6 whitespace-pre-wrap md:mr-12'>
+            <div key={index} className="mr-6 whitespace-pre-wrap md:mr-12">
               {m.role === "user" && (
-                <div className='mb-6 flex gap-3'>
+                <div className="mb-6 flex gap-3">
                   <Avatar>
-                    <AvatarFallback className='text-sm'>U</AvatarFallback>
+                    <AvatarFallback className="text-sm">U</AvatarFallback>
                   </Avatar>
-                  <div className='mt-1.5'>
-                    <p className='font-semibold'>You</p>
-                    <div className='mt-1.5 text-sm text-zinc-500'>
+                  <div className="mt-1.5">
+                    <p className="font-semibold">You</p>
+                    <div className="mt-1.5 text-sm text-zinc-500">
                       {m.content}
                     </div>
                   </div>
                 </div>
               )}
               {m.role === "assistant" && (
-                <div className='mb-6 flex gap-3'>
+                <div className="mb-6 flex gap-3">
                   <Avatar>
-                    <AvatarFallback className='bg-emerald-500 text-white'>
+                    <AvatarFallback className="bg-emerald-500 text-white">
                       AI
                     </AvatarFallback>
                   </Avatar>
-                  <div className='mt-1.5 w-full'>
-                    <div className='flex justify-between'>
-                      <p className='font-semibold'>Bot</p>
+                  <div className="mt-1.5 w-full">
+                    <div className="flex justify-between">
+                      <p className="font-semibold">Bot</p>
                     </div>
-                    <div className='mt-2 text-sm text-zinc-500'>
+                    <div className="mt-2 text-sm text-zinc-500">
                       {m.content}
                     </div>
                   </div>
                 </div>
               )}
+              <div ref={endRef}></div>
             </div>
           ))}
         </ScrollArea>
-        <form className='relative'>
+        <form className="relative">
           <Input
-            name='message'
-            placeholder='Ask me anything......'
-            className='pr-12 placeholder:italic placeholder:text-zinc-600/75 focus-visible:ring-zinc-500'
+            name="message"
+            placeholder="Ask me anything......"
+            className="pr-12 placeholder:italic placeholder:text-zinc-600/75 focus-visible:ring-zinc-500"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
           />
           <Button
-            size='icon'
-            variant='secondary'
-            className='absolute right-1 top-1 h-8 w-10'
+            size="icon"
+            variant="secondary"
+            className="absolute right-1 top-1 h-8 w-10"
             onClick={(event) => sendMessage(event)}
           >
-            <SendHorizonalIcon className='h-5 w-5 text-emerald-500' />
+            <SendHorizonalIcon className="h-5 w-5 text-emerald-500" />
           </Button>
         </form>
       </div>

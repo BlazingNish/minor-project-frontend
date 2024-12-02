@@ -83,7 +83,8 @@ const GenerateQuestions = () => {
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    
+  }, [videoUrl]);
   function extractVideoID(url: string): string|null{
     try {
       const urlObj = new URL(url);
@@ -108,6 +109,7 @@ const GenerateQuestions = () => {
     setVideoUrl(url);
     console.log(truncatedUrl);
     setIsLoading(true);
+    setIsSet(false);
     const content = getContent(truncatedUrl)
     const mcqResponse = axios.post('http://localhost:8000/mcqs',{content: content})
 

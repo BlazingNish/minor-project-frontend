@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { useState } from "react";
 import { Circles } from "react-loader-spinner";
+import Markdown from "react-markdown";
 
 const Summarize = () => {
   const [summary, setSummmary] = useState("");
@@ -50,7 +51,8 @@ const Summarize = () => {
         <CardHeader>
           <CardTitle>Summary</CardTitle>
         </CardHeader>
-        <CardContent className='flex justify-center p-10'>{summary}</CardContent>
+        <CardContent className='flex justify-center p-10'>
+          <Markdown>{summary}</Markdown></CardContent>
       </Card>}
     </div>
   );
