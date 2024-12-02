@@ -60,7 +60,10 @@ const Chat = () => {
       console.error("Error sending message:", error);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Sorry, something went wrong. Please try again." },
+        {
+          role: "assistant",
+          content: "Sorry, something went wrong. Please try again.",
+        },
       ]);
     } finally {
       setNewMessage("");
@@ -69,41 +72,34 @@ const Chat = () => {
   };
 
   return (
-    <section className="py-24 text-zinc-700">
-      <div className="mx-auto mt-3 max-w-lg">
-        <ScrollArea className="mb-2 h-[400px] rounded-md border p-4 overflow-auto">
+    <section className='py-24 text-zinc-700'>
+      <div className='mx-auto mt-3 max-w-lg'>
+        <ScrollArea className='mb-2 h-[400px] rounded-md border p-4 overflow-auto'>
           {messages.map((m, index) => (
-            <div key={index} className="mr-6 whitespace-pre-wrap md:mr-12">
+            <div key={index} className='mr-6 whitespace-pre-wrap md:mr-12'>
               {m.role === "user" ? (
-                <div className="mb-6 flex gap-3">
+                <div className='mb-6 flex gap-3'>
                   <Avatar>
-                    <AvatarFallback className="text-sm">U</AvatarFallback>
+                    <AvatarFallback className='text-sm'>U</AvatarFallback>
                   </Avatar>
-                  <div className="mt-1.5">
-                    <p className="font-semibold">You</p>
-                    <div className="mt-1.5 text-sm text-zinc-500 break-words text-clip">
-                      <p className="text-balance">
-
-                      {m.content}
-                      </p>
+                  <div className='mt-1.5'>
+                    <p className='font-semibold'>You</p>
+                    <div className='mt-1.5 text-sm text-zinc-500 break-words text-clip w-[23rem]'>
+                      <p className='text-balance'>{m.content}</p>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="mb-6 flex gap-3">
+                <div className='mb-6 flex gap-3'>
                   <Avatar>
-                    <AvatarFallback className="bg-emerald-500 text-white">
+                    <AvatarFallback className='bg-emerald-500 text-white'>
                       AI
                     </AvatarFallback>
                   </Avatar>
-                  <div className="mt-1.5">
-                    <p className="font-semibold">Bot</p>
-                    <div className="mt-2 text-sm text-zinc-500 break-words text-clip">
-
-                      <p className="text-balance">
-
-                      {m.content}
-                      </p>
+                  <div className='mt-1.5'>
+                    <p className='font-semibold'>Bot</p>
+                    <div className='mt-2 text-sm text-zinc-500 break-words text-clip w-[23rem]'>
+                      <p className='text-balance'>{m.content}</p>
                     </div>
                   </div>
                 </div>
@@ -112,28 +108,28 @@ const Chat = () => {
           ))}
           <div ref={endRef}></div>
           {isLoading && (
-            <div className="flex justify-center items-center mt-4">
+            <div className='flex justify-center items-center mt-4'>
               <Lottie options={defaultOptions} height={100} width={100} />
             </div>
           )}
         </ScrollArea>
-        <form className="relative" onSubmit={sendMessage}>
+        <form className='relative' onSubmit={sendMessage}>
           <Input
-            name="message"
-            placeholder="Ask me anything..."
-            className="pr-12 placeholder:italic placeholder:text-zinc-600/75 focus-visible:ring-zinc-500"
+            name='message'
+            placeholder='Ask me anything...'
+            className='pr-12 placeholder:italic placeholder:text-zinc-600/75 focus-visible:ring-zinc-500'
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             disabled={isLoading}
           />
           <Button
-            size="icon"
-            variant="secondary"
-            className="absolute right-1 top-1 h-8 w-10"
-            type="submit"
+            size='icon'
+            variant='secondary'
+            className='absolute right-1 top-1 h-8 w-10'
+            type='submit'
             disabled={isLoading}
           >
-            <SendHorizonalIcon className="h-5 w-5 text-emerald-500" />
+            <SendHorizonalIcon className='h-5 w-5 text-emerald-500' />
           </Button>
         </form>
       </div>
